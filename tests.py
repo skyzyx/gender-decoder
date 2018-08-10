@@ -10,7 +10,8 @@ from app.models import JobAd, CodedWordCounter, TranslatedWordlist
 
 
 
-class TestCase(unittest.TestCase):
+class TestJobAd(unittest.TestCase):
+    
     def setUp(self):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
@@ -70,6 +71,13 @@ class TestCase(unittest.TestCase):
         curls = JobAd(u"“Lead” ‘Developer’ v good!")
         self.assertEqual(exclaim.clean_up_word_list(translated_wordlists),
             ['lead', 'developer', 'v', 'good'])
+
+    def test_clean_up_word_list_in_another_language(self):
+        translated_wordlists = TranslatedWordlist("test")
+        caps = JobAd("Fancy some sourdough, sake&glendronach or a sun-downer?")
+        self.assertEqual(caps.clean_up_word_list(translated_wordlists),
+            ['fancy', 'some', 'sourdough', 'sake', 'glendronach', 'or', 'a',
+             'sun-downer'])
 
     def test_extract_coded_words(self):
         j1 = JobAd(u"Ambition:competition–decisiveness, empathy&kindness")
@@ -149,6 +157,33 @@ class TestCase(unittest.TestCase):
         self.assertEqual(j1.feminine_word_count, 2)
         self.assertEqual(j1.feminine_coded_words,"sharing,empathy")
 
+    def test_analyse_in_other_language(self):
+        j1 = JobAd(u"Sourdough-toast with a sake sake manhattan sun-downer", 
+                    "test")
+        self.assertEqual(j1.ad_text, u"Sourdough-toast with a sake sake "
+                                      "manhattan sun-downer")
+        self.assertTrue(j1.coding == "masculine-coded")
+        self.assertEqual(j1.masculine_word_count, 4)
+        self.assertEqual(j1.masculine_coded_words, "sake,sake,manhattan,"
+                                                   "sun-downer")
+        self.assertEqual(j1.feminine_word_count, 1)
+        self.assertEqual(j1.feminine_coded_words,"sourdough")
+
+
+class TestCodedWordCounter(unittest.TestCase):
+    
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
+            basedir, 'test.db')
+        self.app = app.test_client()
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
     def test_increment_or_create(self):
         ad = JobAd(u"sharing leader sharing")
         sharing_counter = CodedWordCounter.query.filter_by(
@@ -189,6 +224,23 @@ class TestCase(unittest.TestCase):
         self.assertEqual(len(counters), 9)
         total_count = sum([counter.count for counter in counters])
         self.assertEqual(total_count, 10)
+
+    def test_process_ad_in_other_language(self):
+        ad = JobAd(u"Sourdough-toast with a sake sake manhattan sun-downer", 
+                    "test")
+        CodedWordCounter.process_ad(ad)
+        counters = CodedWordCounter.query.filter_by(ad_hash=ad.hash).all()
+        self.assertEqual(len(counters), 4)
+        total_count = sum([counter.count for counter in counters])
+        self.assertEqual(total_count, 5)
+
+        masc_coded_words = sorted([counter.word for counter in counters
+            if counter.coding == 'masculine'])
+        fem_coded_words = sorted([counter.word for counter in counters
+            if counter.coding == 'feminine'])
+        self.assertEqual(masc_coded_words, ['manhattan', 'sake', 'sun-downer'])
+        self.assertEqual(fem_coded_words, ['sourdough'])
+
 
 if __name__ == '__main__':
     unittest.main()

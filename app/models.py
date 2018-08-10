@@ -196,6 +196,8 @@ class TranslatedWordlist(object):
     def __init__(self, language):
         if language == "en":
             import app.wordlists.wordlists_en as wordlists
+        elif language == "test":
+            import app.wordlists.wordlists_test as wordlists
         else:
             import app.wordlists.wordlists_en as wordlists
 
