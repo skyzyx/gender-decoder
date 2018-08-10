@@ -6,7 +6,7 @@ import unittest
 
 from config import basedir
 from app import app, db
-from app.models import JobAd, CodedWordCounter
+from app.models import JobAd, CodedWordCounter, TranslatedWordlist
 
 
 
@@ -24,47 +24,51 @@ class TestCase(unittest.TestCase):
         db.drop_all()
 
     def test_clean_up_word_list(self):
+        translated_wordlists = TranslatedWordlist("en")
         caps = JobAd("Sharing is as important as ambition")
-        self.assertEqual(caps.clean_up_word_list(),
+        self.assertEqual(caps.clean_up_word_list(translated_wordlists),
             ['sharing', 'is', 'as', 'important', 'as', 'ambition'])
         tab = JobAd("Qualities: sharing\tambition")
-        self.assertEqual(tab.clean_up_word_list(),
+        self.assertEqual(tab.clean_up_word_list(translated_wordlists),
             ['qualities', 'sharing', 'ambition'])
         semicolon = JobAd("Sharing;ambitious")
-        self.assertEqual(semicolon.clean_up_word_list(),
+        self.assertEqual(semicolon.clean_up_word_list(translated_wordlists),
             ['sharing', 'ambitious'])
         slash = JobAd(u"Sharing/ambitious")
-        self.assertEqual(slash.clean_up_word_list(), ['sharing', 'ambitious'])
+        self.assertEqual(slash.clean_up_word_list(translated_wordlists), 
+            ['sharing', 'ambitious'])
         hyphen = JobAd(u"Sharing, co-operative, 'servant-leader'")
-        self.assertEqual(hyphen.clean_up_word_list(),
+        self.assertEqual(hyphen.clean_up_word_list(translated_wordlists),
             ['sharing', 'co-operative', 'servant', 'leader'])
         mdash = JobAd(u"Sharing—ambitious")
-        self.assertEqual(mdash.clean_up_word_list(), ['sharing', 'ambitious'])
+        self.assertEqual(mdash.clean_up_word_list(translated_wordlists),
+            ['sharing', 'ambitious'])
         bracket = JobAd(u"Sharing(ambitious) and (leader)")
-        self.assertEqual(bracket.clean_up_word_list(), ['sharing', 'ambitious',
-            'and', 'leader'])
+        self.assertEqual(bracket.clean_up_word_list(translated_wordlists),
+            ['sharing', 'ambitious', 'and', 'leader'])
         sqbracket = JobAd(u"Sharing[ambitious] and [leader]")
-        self.assertEqual(sqbracket.clean_up_word_list(), ['sharing',
-            'ambitious', 'and', 'leader'])
+        self.assertEqual(sqbracket.clean_up_word_list(translated_wordlists),
+            ['sharing', 'ambitious', 'and', 'leader'])
         abracket = JobAd(u"Sharing<ambitious> and <leader>")
-        self.assertEqual(abracket.clean_up_word_list(), ['sharing',
-            'ambitious', 'and', 'leader'])
+        self.assertEqual(abracket.clean_up_word_list(translated_wordlists),
+            ['sharing', 'ambitious', 'and', 'leader'])
         space = JobAd(u"Sharing ambitious ")
-        self.assertEqual(space.clean_up_word_list(), ['sharing', 'ambitious'])
+        self.assertEqual(space.clean_up_word_list(translated_wordlists),
+            ['sharing', 'ambitious'])
         amp = JobAd(u"Sharing&ambitious, empathy&kindness,")
-        self.assertEqual(amp.clean_up_word_list(),
+        self.assertEqual(amp.clean_up_word_list(translated_wordlists),
             ['sharing', 'ambitious', 'empathy', 'kindness'])
         asterisk = JobAd(u"Sharing&ambitious*, empathy*kindness,")
-        self.assertEqual(asterisk.clean_up_word_list(),
+        self.assertEqual(asterisk.clean_up_word_list(translated_wordlists),
             ['sharing', 'ambitious', 'empathy', 'kindness'])
         atandquestion = JobAd(u"Lead \"Developer\" Who is Connect@HBS? We ")
-        self.assertEqual(atandquestion.clean_up_word_list(),
+        self.assertEqual(atandquestion.clean_up_word_list(translated_wordlists),
             ['lead', 'developer', 'who', 'is', 'connect', 'hbs', 'we'])
         exclaim = JobAd(u"Lead Developer v good!")
-        self.assertEqual(exclaim.clean_up_word_list(),
+        self.assertEqual(exclaim.clean_up_word_list(translated_wordlists),
             ['lead', 'developer', 'v', 'good'])
         curls = JobAd(u"“Lead” ‘Developer’ v good!")
-        self.assertEqual(exclaim.clean_up_word_list(),
+        self.assertEqual(exclaim.clean_up_word_list(translated_wordlists),
             ['lead', 'developer', 'v', 'good'])
 
     def test_extract_coded_words(self):
