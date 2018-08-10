@@ -4,7 +4,7 @@ from wtforms.validators import ValidationError
 import datetime
 from app import app, db
 from app.forms import JobAdForm
-from app.models import JobAd, CodedWordCounter
+from app.models import JobAd, CodedWordCounter, TranslatedWordlist
 from app.wordlists.wordlists_en import *
 
 
@@ -29,10 +29,14 @@ def about():
 def results(ad_hash):
     job_ad = JobAd.query.get_or_404(ad_hash)
     masculine_coded_words, feminine_coded_words = job_ad.list_words()
+    language, source = TranslatedWordlist.get_language_name_and_source(
+                       job_ad.language)
     return render_template('results.html', job_ad=job_ad,
         masculine_coded_words=masculine_coded_words,
         feminine_coded_words=feminine_coded_words,
-        explanation=job_ad.provide_explanation())
+        explanation=job_ad.provide_explanation(),
+        language=language,
+        source=source)
 
 
 @app.errorhandler(404)

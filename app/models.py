@@ -7,6 +7,8 @@ import sys
 import re
 import logging
 import uuid
+import importlib
+
 from binascii import hexlify
 
 from app import app, db
@@ -194,13 +196,15 @@ class CodedWordCounter(db.Model):
 class TranslatedWordlist(object):
     
     def __init__(self, language):
-        if language == "en":
-            import app.wordlists.wordlists_en as wordlists
-        elif language == "test":
-            import app.wordlists.wordlists_test as wordlists
-        else:
-            import app.wordlists.wordlists_en as wordlists
+        wordlists = importlib.import_module('.{0}'.format(language),
+                                            'app.wordlists')
 
         self.hyphenated_coded_words = wordlists.hyphenated_coded_words
         self.masculine_coded_words = wordlists.masculine_coded_words
         self.feminine_coded_words = wordlists.feminine_coded_words
+
+    @classmethod
+    def get_language_name_and_source(cls, language):
+        my_module = importlib.import_module('.{0}'.format(language),
+                                            'app.wordlists')
+        return my_module.language, my_module.source

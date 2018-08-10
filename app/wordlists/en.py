@@ -1,5 +1,7 @@
-# These words are written as the stem to make it easier to match all variants.
-# In other words, the suffix is intentionally left out.
+source = ""
+language = "English"
+language_code = "en"
+
 
 feminine_coded_words = [
     "agree",
@@ -108,12 +110,7 @@ masculine_coded_words = [
     "unreasonab"
 ]
 
-hyphenated_coded_words = [
-    "co-operat",
-    "inter-personal",
-    "inter-dependen",
-    "inter-persona",
-    "self-confiden",
-    "self-relian",
-    "self-sufficien"
-]
+hyphenated_coded_words = [word for word in feminine_coded_words
+                          if "-" in word] + [
+                          word for word in masculine_coded_words 
+                          if "-" in word]
