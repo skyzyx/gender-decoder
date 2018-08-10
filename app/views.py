@@ -5,6 +5,7 @@ import datetime
 from app import app, db
 from app.forms import JobAdForm
 from app.models import JobAd, CodedWordCounter
+from app.wordlists.wordlists_en import *
 
 
 @app.route('/', methods=['GET', 'POST'])
