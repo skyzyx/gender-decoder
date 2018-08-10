@@ -12,7 +12,7 @@ from app.wordlists import *
 def home():
     form = JobAdForm()
     if request.method == "POST" and form.validate_on_submit():
-        ad = JobAd(form.texttotest.data)
+        ad = JobAd(form.texttotest.data, form.language.data)
         return redirect('results/{0}'.format(ad.hash))
     return render_template('home.html',
                           form=form)

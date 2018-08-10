@@ -17,6 +17,7 @@ class JobAd(db.Model):
     hash = db.Column(db.String(), primary_key=True)
     date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     ad_text = db.Column(db.Text)
+    language = db.Column(db.String(), default="en", nullable=True)
     masculine_word_count = db.Column(db.Integer, default=0)
     feminine_word_count = db.Column(db.Integer, default=0)
     masculine_coded_words = db.Column(db.Text)
@@ -24,9 +25,10 @@ class JobAd(db.Model):
     coding = db.Column(db.String())
     coded_word_counter = db.relationship("CodedWordCounter", backref='job_ad')
 
-    def __init__(self, ad_text):
+    def __init__(self, ad_text, language="en"):
         self.hash = str(uuid.uuid4())
         self.ad_text = ad_text
+        self.language = language
         self.analyse()
         db.session.add(self)
         db.session.commit()
