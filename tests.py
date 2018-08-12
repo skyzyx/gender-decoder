@@ -241,6 +241,34 @@ class TestCodedWordCounter(unittest.TestCase):
         self.assertEqual(masc_coded_words, ['manhattan', 'sake', 'sun-downer'])
         self.assertEqual(fem_coded_words, ['sourdough'])
 
+class TestTranslatedWordlist(unittest.TestCase):
+    
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
+            basedir, 'test.db')
+        self.app = app.test_client()
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_init(self):
+        t = TranslatedWordlist("test")
+        self.assertEqual(t.hyphenated_coded_words, ["ready-made", "sun-down"])
+        self.assertEqual(t.masculine_coded_words,
+                         ["glendronach", "spritzer", "sake", "manhattan",
+                          "sun-down"])
+        self.assertEqual(t.feminine_coded_words,
+                         ["humblebrag", "ready-made", "cloud", "sourdough",
+                          "pabst"])
+
+    def test_get_language_name_and_source(self):
+        a, b = TranslatedWordlist.get_language_name_and_source("test")
+        self.assertEqual(a, "Gobbledegook")
+        self.assertEqual(b, "novelty lorem ipsum generators")
+
 
 if __name__ == '__main__':
     unittest.main()
