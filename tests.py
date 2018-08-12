@@ -271,5 +271,27 @@ class TestTranslatedWordlist(unittest.TestCase):
         self.assertEqual(c, "novelty lorem ipsum generators")
 
 
+class TestForms(unittest.TestCase):
+
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
+            basedir, 'test.db')
+        self.app = app.test_client()
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+
+    def test_language_field(self):
+        with app.app_context():
+            from app.forms import JobAdForm
+            form = JobAdForm()
+            self.assertEqual(form.language.default, ("en", "English"))
+            self.assertEqual(form.language.choices, [("en", "English")])
+            # self.assertEqual(form.language.choices, [("en", "English"), 
+            #                                          ('test', 'Gobbledegook')])
+
 if __name__ == '__main__':
     unittest.main()

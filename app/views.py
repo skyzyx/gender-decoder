@@ -17,7 +17,8 @@ def home():
         ad = JobAd(form.texttotest.data, form.language.data)
         return redirect('results/{0}'.format(ad.hash))
     return render_template('home.html',
-                          form=form)
+                          form=form,
+                          number_of_languages=len(wordlists.__all__))
 
 
 @app.route('/about')

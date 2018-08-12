@@ -1,6 +1,6 @@
 import importlib
 
-__all__ = ["en", "test"]
+__all__ = ["en"]
 
 all_lists = {}
 
