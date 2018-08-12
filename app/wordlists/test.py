@@ -1,5 +1,5 @@
 source = "novelty lorem ipsum generators"
-language = "Gobbledegook" # must not include spaces
+language_name = "Gobbledegook"
 language_code = "test"
 
 feminine_coded_words = [

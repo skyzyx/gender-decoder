@@ -207,4 +207,6 @@ class TranslatedWordlist(object):
     def get_language_name_and_source(cls, language):
         my_module = importlib.import_module('.{0}'.format(language),
                                             'app.wordlists')
-        return my_module.language, my_module.source
+        return (my_module.language_name,
+                my_module.language_code,
+                my_module.source)

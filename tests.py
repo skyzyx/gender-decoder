@@ -265,9 +265,10 @@ class TestTranslatedWordlist(unittest.TestCase):
                           "pabst"])
 
     def test_get_language_name_and_source(self):
-        a, b = TranslatedWordlist.get_language_name_and_source("test")
+        a, b, c = TranslatedWordlist.get_language_name_and_source("test")
         self.assertEqual(a, "Gobbledegook")
-        self.assertEqual(b, "novelty lorem ipsum generators")
+        self.assertEqual(b, "test")
+        self.assertEqual(c, "novelty lorem ipsum generators")
 
 
 if __name__ == '__main__':
