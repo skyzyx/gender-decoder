@@ -52,7 +52,8 @@ feminine_coded_words = [
     "enthusias",
     "inclusive",
     "yield",
-    "shar"
+    "share",
+    "shari"
 ]
 
 masculine_coded_words = [
